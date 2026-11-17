@@ -19,4 +19,10 @@ int insert_word(mainnode_t **head, char *word, char *filename);
 
 void create_database(Slist *head, mainnode_t *hash_table[]);
 
+void display_database(mainnode_t *hash_table[]);
+
+void search_database(mainnode_t *hash_table[],char*word);
+
+void save_database(mainnode_t *hash_table[]);
+
 #endif

@@ -4,8 +4,9 @@
 int main(int argc, char *argv[])
 {
     Slist *head = NULL;
-
     mainnode_t *hash_table[SIZE] = {NULL};
+    int choice;
+    char word[50];
 
     if (argc < 2)
     {
@@ -13,7 +14,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // Validate and insert filenames
     for (int i = 1; i < argc; i++)
     {
         if (validate_file(argv[i]))
@@ -25,27 +25,54 @@ int main(int argc, char *argv[])
             }
 
             if (insert_at_last(&head, argv[i]))
-            {
                 printf("%s : File added successfully\n", argv[i]);
-            }
             else
-            {
                 printf("Memory allocation failed\n");
-            }
         }
     }
 
-    // Create database
-    printf("\nCreating Database...\n");
+    do
+    {
+        printf("\n----- INVERTED SEARCH MENU -----\n");
+        printf("1. Create Database\n");
+        printf("2. Display Database\n");
+        printf("3. Search Database\n");
+        printf("4. Save Database\n");
+        printf("5. Exit\n");
 
-    create_database(head, hash_table);
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
 
-    // Print valid filenames
-    printf("\nValid files:\n");
+        switch (choice)
+        {
+            case 1:
+                create_database(head, hash_table);
+                break;
 
-    print_list(head);
+            case 2:
+                display_database(hash_table);
+                break;
 
-    // Free filename linked list
+            case 3:
+                printf("Enter the word to search: ");
+                scanf("%49s", word);
+                search_database(hash_table, word);
+                break;
+
+            case 4:
+                save_database(hash_table);
+                break;
+
+            case 5:
+                printf("Exiting program...\n");
+                break;
+
+            default:
+                printf("Invalid choice\n");
+        }
+
+    } while (choice != 5);
+
     free_list(head);
 
     return 0;

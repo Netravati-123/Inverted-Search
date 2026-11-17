@@ -270,3 +270,142 @@ void create_database(Slist *head, mainnode_t *hash_table[])
 
     printf("Database created successfully\n");
 }
+
+void display_database(mainnode_t *hash_table[])
+{
+    mainnode_t *m_temp;
+    subnode_t *s_temp;
+
+    printf("\nIndex\tWord\tFile Count\tFilename\tWord Count\n");
+
+    for (int i = 0; i < SIZE; i++)
+    {
+        m_temp = hash_table[i];
+
+        while (m_temp != NULL)
+        {
+            printf("%d\t%s\t%d\t\t",
+                   i, m_temp->word, m_temp->file_count);
+
+            s_temp = m_temp->sub_link;
+
+            while (s_temp != NULL)
+            {
+                printf("%s\t%d\t",
+                       s_temp->filename, s_temp->word_count);
+
+                s_temp = s_temp->link;
+            }
+
+            printf("\n");
+            m_temp = m_temp->link;
+        }
+    }
+}
+
+void search_database(mainnode_t *hash_table[], char *word)
+{
+    int index;
+    mainnode_t *temp;
+    subnode_t *s_temp;
+
+    // Convert word to lowercase
+    for (int i = 0; word[i] != '\0'; i++)
+    {
+        word[i] = tolower((unsigned char)word[i]);
+    }
+
+    // Find index
+    index = hash_function(word);
+
+    // Access hash table index
+    temp = hash_table[index];
+
+    // Search for word
+    while (temp != NULL)
+    {
+        if (strcmp(temp->word, word) == 0)
+        {
+            printf("Word \"%s\" is present in %d files\n",
+                   temp->word, temp->file_count);
+
+            s_temp = temp->sub_link;
+
+            while (s_temp != NULL)
+            {
+                printf("In %s : %d times\n",s_temp->filename, s_temp->word_count);
+
+                s_temp = s_temp->link;
+            }
+
+            return;
+        }
+
+        temp = temp->link;
+    }
+
+    printf("Word \"%s\" is not present in the database\n", word);
+}
+
+void save_database(mainnode_t *hash_table[])
+{
+    FILE *fp;
+    char filename[100];
+    char *ext;
+    mainnode_t *m_temp;
+    subnode_t *s_temp;
+
+    printf("Enter the file name to save: ");
+    scanf("%99s", filename);
+
+    ext = strrchr(filename, '.');
+
+    if (ext == NULL || strcmp(ext, ".txt") != 0)
+    {
+        printf("Error: Invalid file extension\n");
+        return;
+    }
+
+    fp = fopen(filename, "w");
+
+    if (fp == NULL)
+    {
+        printf("Error: Unable to open file\n");
+        return;
+    }
+
+    for (int i = 0; i < SIZE; i++)
+    {
+        m_temp = hash_table[i];
+
+        if (m_temp != NULL)
+        {
+            fprintf(fp, "#%d;", i);
+
+            while (m_temp != NULL)
+            {
+                fprintf(fp, "%s;%d;",
+                        m_temp->word, m_temp->file_count);
+
+                s_temp = m_temp->sub_link;
+
+                while (s_temp != NULL)
+                {
+                    fprintf(fp, "%s;%d;",
+                            s_temp->filename,
+                            s_temp->word_count);
+
+                    s_temp = s_temp->link;
+                }
+
+                m_temp = m_temp->link;
+            }
+
+            fprintf(fp, "#\n");
+        }
+    }
+
+    fclose(fp);
+
+    printf("Database saved successfully\n");
+}
